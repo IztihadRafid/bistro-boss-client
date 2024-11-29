@@ -44,7 +44,6 @@ const Login = () => {
             `
           }
         });
-        navigate(from,{replace:true})
       })
   }
   const handleValidateCaptcha = (e) => {

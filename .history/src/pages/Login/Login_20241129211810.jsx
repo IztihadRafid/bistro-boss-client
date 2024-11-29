@@ -1,16 +1,12 @@
-import { useContext, useEffect, useState } from 'react';
+import { useContext, useEffect, useRef, useState } from 'react';
 import { loadCaptchaEnginge, LoadCanvasTemplate, LoadCanvasTemplateNoReload, validateCaptcha } from 'react-simple-captcha';
 import { AuthContext } from '../../providers/AuthProvider';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
-import Swal from 'sweetalert2';
 const Login = () => {
-  
+  const captchaRef = useRef(null)
   const [disabled, setDisabled] = useState(true)
-  const { signIn } = useContext(AuthContext);
-  const navigate = useNavigate();
-  const location = useLocation();
-  const from = location.state?.from?.pathname || '/'
+  const { signIn } = useContext(AuthContext)
 
   useEffect(() => {
     loadCaptchaEnginge(6);
@@ -27,40 +23,19 @@ const Login = () => {
       .then(result => {
         const user = result.user;
         console.log(user);
-        Swal.fire({
-          title: "User Login Successfull",
-          showClass: {
-            popup: `
-              animate__animated
-              animate__fadeInUp
-              animate__faster
-            `
-          },
-          hideClass: {
-            popup: `
-              animate__animated
-              animate__fadeOutDown
-              animate__faster
-            `
-          }
-        });
-        navigate(from,{replace:true})
       })
   }
-  const handleValidateCaptcha = (e) => {
-    const user_captcha_value = e.target.value;
+  const handleValidateCaptcha = () => {
+    const user_captcha_value = captchaRef.current.value;
     if (validateCaptcha(user_captcha_value)) {
       setDisabled(false)
-    }
-    else{
-      setDisabled(true)
     }
 
   }
   return (
     <>
       <Helmet>
-        <title>Bistro Boss | Login</title>
+        <title>Bistro Boss | Sign Up</title>
       </Helmet>
       <div className="hero bg-base-200 min-h-screen">
         <div className="hero-content flex-col md:flex-row-reverse">
@@ -92,17 +67,16 @@ const Login = () => {
                 <label className="label">
                   <LoadCanvasTemplate></LoadCanvasTemplate>
                 </label>
-                <input onBlur={handleValidateCaptcha} type="text"  name="captcha" placeholder="type the captcha above" className="input input-bordered" required />
-               
+                <input type="text" ref={captchaRef} name="captcha" placeholder="type the captcha above" className="input input-bordered" required />
+                <button onClick={handleValidateCaptcha} className='btn btn-outline btn-xs'>validate</button>
               </div>
               <div className="form-control mt-6">
-                <input disabled={disabled}  className="btn btn-primary" type="submit" value="Login" />
+                <input disabled={disabled} className="btn btn-primary" type="submit" value="Login" />
               </div>
             </form>
-            <p className='text-center p-1 my-1'><small>New Here? <Link className='text-blue-500 text-lg'to='/signup'>Sign Up</Link></small></p>
-           
+            <p><small>New Here?<Link to='/signup'>Sign Up</Link></small></p>
           </div>
-           
+            <p className='text-blue-500 text-lg'><small>Already Have an account?<Link to='/login'>Login</Link></small></p>
         </div>
       </div>
     </>
